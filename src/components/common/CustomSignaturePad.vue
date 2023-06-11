@@ -2,7 +2,12 @@
   <div @touchmove.prevent>
     <canvas
       :id="id"
-      class="canvas"
+      class="canvas w-100"
+      :class="{
+        'rounded': isRounded,
+        'border': isBordered,
+        canvasClass
+      }"
       :data-uid="id"
       :disabled="disabled"
     ></canvas>
@@ -45,8 +50,20 @@ const props = defineProps({
   },
   defaultUrl: {
     type: String,
-    default: "",
-  }
+    default: '',
+  },
+  isRounded: {
+    type: Boolean,
+    default: false,
+  },
+  isBordered: {
+    type: Boolean,
+    default: false,
+  },
+  canvasClass: {
+    type: String,
+    default: '',
+  },
 })
 
 const sig = ref({});
@@ -69,8 +86,8 @@ const getSignatureOption = computed(() => {
     case signatureColorOption.Primary:
     default:
       return {
-        backgroundColor: "rgb(255,255,255)",
-        penColor: "rgb(0, 0, 0)",
+        backgroundColor: 'whitesmoke',
+        penColor: 'rgb(0, 0, 0)',
       }
   }
 });
@@ -90,8 +107,7 @@ const draw = () => {
   if (props.disabled) sig.value.off();
   else sig.value.on();
 };
-
-function resizeCanvas(c) {
+const resizeCanvas = (c) => {
   let url;
   if (!isEmptySignature.value) url = save();
   let ratio = Math.max(window.devicePixelRatio || 1, 1);
@@ -103,7 +119,6 @@ function resizeCanvas(c) {
   !props.clearOnResize && url !== undefined && fromDataURL.value(url);
   if(props.watermark) Object.keys(props.watermark)?.length && addWaterMark(props.watermark);
 }
-
 const clear = () => {
   sig.value.clear();
 };
@@ -157,10 +172,3 @@ defineExpose({
   fromDataURL: fromDataURL.value,
 })
 </script>
-<style scoped>
-#sig-canvas {
-  border: 2px dotted #CCCCCC;
-  border-radius: 15px;
-  cursor: crosshair;
-}
-</style>

@@ -1,0 +1,12 @@
+.navbar-brand > img {
+  max-width: 150px;
+}
+.nav-link,
+.nav-link:hover,
+.nav-link:visited,
+.nav-link:active {
+  color: #06a1ca;
+}
+.fs-14 {
+  font-size: 14px;
+}
