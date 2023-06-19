@@ -67,6 +67,7 @@ const props = defineProps({
 })
 
 const sig = ref({});
+const initial = ref(null);
 
 watch(
   () => props.disabled,
@@ -91,7 +92,6 @@ const getSignatureOption = computed(() => {
       }
   }
 });
-const isEmptySignature = computed(() => sig.value._isEmpty);
 const fromDataURL = computed(() => (url) => sig.value.fromDataURL(url));
 
 //methods
@@ -101,15 +101,14 @@ const draw = () => {
 
   window.addEventListener("resize", resizeCanvas(canvas));
   resizeCanvas(canvas);
-  if (props.defaultUrl !== "") {
-    fromDataURL(props.defaultUrl);
-  }
+  if (props.defaultUrl) fromDataURL(props.defaultUrl);
   if (props.disabled) sig.value.off();
   else sig.value.on();
+
+  initial.value = save();
 };
 const resizeCanvas = (c) => {
   let url;
-  if (!isEmptySignature.value) url = save();
   let ratio = Math.max(window.devicePixelRatio || 1, 1);
   const reg = RegExp(/px/);
   c.width = reg.test(props.width) ? props.width.replace(/px/g, "") * ratio : c.offsetWidth * ratio;
@@ -127,6 +126,10 @@ const save = (format) => {
   // signaturePad.toDataURL(); // save image as PNG
   // signaturePad.toDataURL("image/jpeg"); // save image as JPEG
   // signaturePad.toDataURL("image/svg+xml"); // save image as SVG
+};
+const isEmpty = () => {
+  const data = save();
+  return data === initial.value;
 };
 const undo = () => {
   let data = sig.value.toData();
@@ -160,13 +163,12 @@ const addWaterMark = (data) => {
   } else {
     ctx.fillText(textData.text, textData.x, textData.y);
   }
-  sig.value._isEmpty = false;
 };
 
 defineExpose({
   save,
   clear,
-  isEmpty: isEmptySignature.value,
+  isEmpty: isEmpty,
   undo,
   addWaterMark,
   fromDataURL: fromDataURL.value,
