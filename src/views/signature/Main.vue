@@ -46,11 +46,11 @@
           is-bordered
         />
         <div class="toolbar d-flex justify-content-end bg-white rounded">
-          <button class="btn btn-outline-secondary" @click="onClear">
+          <button type="button" class="btn btn-outline-secondary" @click="onClear">
             <i class="fas fa-broom" />
             <span class="ms-2">Limpiar</span>
           </button>
-          <button class="btn btn-secondary ms-2" @click="onUndo">
+          <button type="button" class="btn btn-secondary ms-2" @click="onUndo">
             <i class="fas fa-undo" />
             <span class="ms-2">Rehacer</span>
           </button>
@@ -104,8 +104,8 @@ const onSubmit = async ({ validate, resetForm, values }) => {
 
   if(isEmptySignature.value || !valid) return;
 
-  // ++signatureKey.value;
-  // await resetForm();
+  ++signatureKey.value;
+  await resetForm();
   
   const payload = {
     ...values,
