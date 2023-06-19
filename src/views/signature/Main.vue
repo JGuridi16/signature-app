@@ -103,9 +103,6 @@ const onSubmit = async ({ validate, resetForm, values }) => {
   isEmptySignature.value = signatureRef.value.isEmpty();
 
   if(isEmptySignature.value || !valid) return;
-
-  ++signatureKey.value;
-  await resetForm();
   
   const payload = {
     ...values,
@@ -116,6 +113,9 @@ const onSubmit = async ({ validate, resetForm, values }) => {
 
   try {
     await _saveSignatureData(payload);
+
+    // ++signatureKey.value;
+    // await resetForm();
   } catch (e) {
     console.error(e)
   }
