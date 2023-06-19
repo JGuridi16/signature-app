@@ -27,5 +27,5 @@ coverage
 *.sln
 *.sw?
 yarn.lock
-**/.env
-.env.*
+.env
+.env.development
