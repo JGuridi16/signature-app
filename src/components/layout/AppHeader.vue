@@ -9,9 +9,6 @@
     </button>
     <div class="collapse navbar-collapse" id="burgerNavbar">
       <ul class="navbar-nav ms-5">
-        <li class="nav-item">
-          <router-link class="nav-link fw-bold" :to="{ name: 'signature' }">Firma Digital</router-link>
-        </li>
       </ul>
     </div>
   </div>
