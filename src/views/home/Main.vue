@@ -1,6 +1,9 @@
 <template>
   <div class="container-fluid row mx-auto p-0">
     <Form v-slot="{ validate, resetForm, values }" :validation-schema="schema" class="form bg-light row mx-auto px-0 py-3 col-12 col-md-6 offset-md-3 my-3 fs-14 shadow rounded">
+      <div class="header mb-4 col-12">
+        <h6 class="text-muted">Los datos suministrados deben ser del titular o dueño de la tarjeta de crédito</h6>
+      </div>
       <div class="name-input mb-2 col-12 col-md-6">
         <label for="name" class="form-label">Nombre:</label>
         <Field type="text" class="form-control" id="name" v-model="name" name="name" />
@@ -15,10 +18,38 @@
           <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
         </ErrorMessage>
       </div>
+      <div class="reservation-input mb-2 col-12 col-md-6">
+        <label for="reservation" class="form-label">Número de Reservación:</label>
+        <Field type="number" class="form-control" id="reservation" v-model="reservationNumber" name="reservationNumber" />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="reservationNumber">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+      </div>
       <div class="email-input mb-2 col-12 col-md-6">
         <label for="email" class="form-label">Correo:</label>
         <Field type="email" class="form-control" id="email" v-model="email" name="email" placeholder="example@gmail.com"/>
         <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="email">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+      </div>
+      <div class="address-input mb-2 col-12 col-md-6">
+        <label for="address" class="form-label">Dirección:</label>
+        <Field type="text" class="form-control" id="address" v-model="address" name="address" />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="address">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+      </div>
+      <div class="phone-input mb-2 col-12 col-md-6">
+        <label for="phone" class="form-label">Teléfono:</label>
+        <Field max="10" type="phone" class="form-control" id="phone" v-model="phone" name="phone" />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="phone">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+      </div>
+      <div class="zip-area-input mb-2 col-12 col-md-6">
+        <label for="zipArea" class="form-label">Código de Area:</label>
+        <Field type="number" class="form-control" id="zipArea" v-model="zipArea" name="zipArea" />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="zipArea">
           <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
         </ErrorMessage>
       </div>
@@ -29,10 +60,24 @@
           <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
         </ErrorMessage>
       </div>
-      <div class="reservation-input mb-2 col-12 col-md-6">
-        <label for="reservation" class="form-label">Número de Reservación:</label>
-        <Field type="number" class="form-control" id="reservation" v-model="reservationNumber" name="reservationNumber" />
-        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="reservationNumber">
+      <div class="expiration-date-input mb-2 col-12 col-md-6">
+        <label for="expirationDate" class="form-label">Fecha de Expiración:</label>
+        <Field type="date" class="form-control" id="expirationDate" v-model="expirationDate" name="expirationDate" />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="expirationDate">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+      </div>
+      <div class="security-code-input mb-2 col-12 col-md-6">
+        <label for="securityCode" class="form-label">Código de Seguridad:</label>
+        <Field type="number" class="form-control" id="securityCode" v-model="securityCode" name="securityCode" />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="securityCode">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+      </div>
+      <div class="amount-input mb-2 col-12 col-md-6">
+        <label for="amount" class="form-label">Monto:</label>
+        <Field type="number" class="form-control" id="amount" v-model="amount" name="amount" />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="amount">
           <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
         </ErrorMessage>
       </div>
@@ -63,7 +108,7 @@
           type="button"
           @click="onSubmit({ validate, resetForm, values })"
         >
-          Guardar Firma
+          Guardar
         </button>
       </div>
     </Form>
@@ -86,9 +131,15 @@ const bindedMask = reactive({});
 const schema = Yup.object({
   name: Yup.string().min(3, 'Mínimo tres caracteres.').required('El nombre es requerido.'),
   lastname: Yup.string().min(3, 'Mínimo tres caracteres.').required('El apellido es requerido.'),
+  phone: Yup.number().required('El número de teléfono es requerido.'),
   email: Yup.string().email('Correo inválido.').required('El correo electrónico es requerido.'),
+  address: Yup.string().min(3, 'Mínimo tres caracteres.').required('La dirección es requerida.'),
   creditCard: Yup.string().required('La tarjeta de crédito es requerida.'),
   reservationNumber: Yup.number().required('El número de reservación es requerido.'),
+  zipArea: Yup.number().required('El número de de área es requerido.'),
+  securityCode: Yup.number().required('El código de seguridad es requerido.'),
+  expirationDate: Yup.string().required('La fecha de expiración es requerida.'),
+  amount: Yup.number().required('El monto es requerido.'),
 });
 
 const signatureError = computed(() => (isEmptySignature.value && wasValidated.value ? 'La firma es requerida.': ''));
@@ -109,6 +160,9 @@ const onSubmit = async ({ validate, resetForm, values }) => {
     creditCard: bindedMask.unmasked,
     reservationNumber: Number(values.reservationNumber),
     signature: signatureRef.value.save(),
+    amount: Number(values.amount),
+    securityCode: Number(values.securityCode),
+    zipCode: Number(values.zipArea),
   };
 
   try {
