@@ -81,6 +81,25 @@
           <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
         </ErrorMessage>
       </div>
+      <div class="identification-photo mb-2 col-12 col-md-6">
+        <label for="identification-photo" class="form-label">Documento de Identificación:</label>
+        <Field type="file" class="form-control" id="identification-photo" v-model="identificationPhoto"
+          name="identificationPhoto" accept="image/*"
+        />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="identificationPhoto">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+        {{ message }}
+      </div>
+      <div class="card-info-image mb-2 col-12 col-md-6">
+        <label for="card-info-image" class="form-label">Foto de Tarjeta:</label>
+        <Field type="file" class="form-control" id="card-info-image" v-model="cardInfoImage"
+          name="cardInfoImage" accept="image/*"
+        />
+        <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="cardInfoImage">
+          <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
+        </ErrorMessage>
+      </div>
       <div class="col-12 signature-container mt-3">
         <div class="h5">Pad de Firma</div>
         <custom-signature-pad
@@ -122,6 +141,8 @@ import { Field, Form, ErrorMessage } from 'vee-validate';
 import * as Yup from 'yup';
 import { saveSignatureData as _saveSignatureData } from '@/services/signature.api.js';
 
+const MAX_FILE_SIZE = 2097152; //2 MB
+
 const signatureRef = ref(null);
 const isEmptySignature = ref(true);
 const wasValidated = ref(false);
@@ -131,7 +152,7 @@ const bindedMask = reactive({});
 const schema = Yup.object({
   name: Yup.string().min(3, 'Mínimo tres caracteres.').required('El nombre es requerido.'),
   lastname: Yup.string().min(3, 'Mínimo tres caracteres.').required('El apellido es requerido.'),
-  phone: Yup.number().required('El número de teléfono es requerido.'),
+  phone: Yup.number().typeError('El teléfono debe ser un número válido.').required('El número de teléfono es requerido.'),
   email: Yup.string().email('Correo inválido.').required('El correo electrónico es requerido.'),
   address: Yup.string().min(3, 'Mínimo tres caracteres.').required('La dirección es requerida.'),
   creditCard: Yup.string().required('La tarjeta de crédito es requerida.'),
@@ -140,6 +161,12 @@ const schema = Yup.object({
   securityCode: Yup.number().required('El código de seguridad es requerido.'),
   expirationDate: Yup.string().required('La fecha de expiración es requerida.'),
   amount: Yup.number().required('El monto es requerido.'),
+  identificationPhoto: Yup.mixed().required('La foto de identificación es requerida.')
+    .test("is-valid-size", "El tamaño máximo permitido por archivo es 2MB.", 
+      value => value && value.size <= MAX_FILE_SIZE),
+  cardInfoImage: Yup.mixed().required('La foto de la tarjeta es requerida.')
+    .test("is-valid-size", "El tamaño máximo permitido por archivo es 2MB.", 
+      value => value && value.size <= MAX_FILE_SIZE),
 });
 
 const signatureError = computed(() => (isEmptySignature.value && wasValidated.value ? 'La firma es requerida.': ''));
@@ -154,24 +181,30 @@ const onSubmit = async ({ validate, resetForm, values }) => {
   isEmptySignature.value = signatureRef.value.isEmpty();
 
   if(isEmptySignature.value || !valid) return;
-  
-  const payload = {
-    ...values,
-    creditCard: bindedMask.unmasked,
-    reservationNumber: Number(values.reservationNumber),
-    signature: signatureRef.value.save(),
-    amount: Number(values.amount),
-    securityCode: Number(values.securityCode),
-    zipCode: Number(values.zipArea),
-  };
+
+  const data = new FormData();
+  data.append('identificationPhoto', values.identificationPhoto);
+  data.append('cardInfoImage', values.cardInfoImage);
+  data.append('name', values.name);
+  data.append('lastname', values.lastname);
+  data.append('phone', values.phone);
+  data.append('email', values.email);
+  data.append('address', values.address);
+  data.append('expirationDate', values.expirationDate);
+  data.append('creditCard', bindedMask.unmasked);
+  data.append('reservationNumber', Number(values.reservationNumber));
+  data.append('signature', signatureRef.value.save());
+  data.append('amount', Number(values.amount));
+  data.append('securityCode', Number(values.securityCode));
+  data.append('zipCode', Number(values.zipArea));
 
   try {
-    await _saveSignatureData(payload);
+    await _saveSignatureData(data);
 
     ++signatureKey.value;
     await resetForm();
   } catch (e) {
-    console.error(e)
+    console.error(e);
   }
 };
 

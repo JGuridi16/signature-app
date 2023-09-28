@@ -13,4 +13,8 @@ const apiClient = axios.create({
 const baseApiURL = 'api/signature';
 
 export const saveSignatureData = async (payload) =>
-  await apiClient.post(`${baseApiURL}/save`, payload);
+  await apiClient.post(`${baseApiURL}/save`, payload, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    },
+  });
