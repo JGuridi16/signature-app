@@ -140,6 +140,7 @@ import { computed, reactive, ref, watch } from 'vue';
 import { Field, Form, ErrorMessage } from 'vee-validate';
 import * as Yup from 'yup';
 import { saveSignatureData as _saveSignatureData } from '@/services/signature.api.js';
+import Swal from 'sweetalert2';
 
 const MAX_FILE_SIZE = 2097152; //2 MB
 
@@ -201,10 +202,21 @@ const onSubmit = async ({ validate, resetForm, values }) => {
   data.append('zipCode', values.zipArea);
 
   try {
-    await _saveSignatureData(data);
+    const { data: isSaved } = await _saveSignatureData(data);
 
     // ++signatureKey.value;
     // await resetForm();
+
+    if (!isSaved) return; 
+
+    await Swal.fire({
+      title: '¡Datos guardados exitosamente!',
+      icon: 'success',
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      html: '&nbsp;'
+    });
   } catch (e) {
     console.error(e);
   }
