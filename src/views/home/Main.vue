@@ -47,8 +47,8 @@
         </ErrorMessage>
       </div>
       <div class="zip-area-input mb-2 col-12 col-md-6">
-        <label for="zipArea" class="form-label">Código de Area:</label>
-        <Field type="number" class="form-control" id="zipArea" v-model="zipArea" name="zipArea" />
+        <label for="zipArea" class="form-label">Código Postal:</label>
+        <Field type="text" class="form-control" id="zipArea" v-model="zipArea" name="zipArea" />
         <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="zipArea">
           <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
         </ErrorMessage>
@@ -157,7 +157,9 @@ const schema = Yup.object({
   address: Yup.string().min(3, 'Mínimo tres caracteres.').required('La dirección es requerida.'),
   creditCard: Yup.string().required('La tarjeta de crédito es requerida.'),
   reservationNumber: Yup.number().required('El número de reservación es requerido.'),
-  zipArea: Yup.number().required('El número de de área es requerido.'),
+  zipArea: Yup.string().required('El número de de área es requerido.')
+    .test("is-area-code", "El número de de área solo contiene números.", 
+      value => value && !isNaN(value)),
   securityCode: Yup.number().required('El código de seguridad es requerido.'),
   expirationDate: Yup.string().required('La fecha de expiración es requerida.'),
   amount: Yup.number().required('El monto es requerido.'),
@@ -196,13 +198,13 @@ const onSubmit = async ({ validate, resetForm, values }) => {
   data.append('signature', signatureRef.value.save());
   data.append('amount', Number(values.amount));
   data.append('securityCode', Number(values.securityCode));
-  data.append('zipCode', Number(values.zipArea));
+  data.append('zipCode', values.zipArea);
 
   try {
     await _saveSignatureData(data);
 
-    ++signatureKey.value;
-    await resetForm();
+    // ++signatureKey.value;
+    // await resetForm();
   } catch (e) {
     console.error(e);
   }
