@@ -125,6 +125,7 @@
         <button
           class="col-12 btn btn-success"
           type="button"
+          :disabled="isSubmissionLocked"
           @click="onSubmit({ validate, resetForm, values })"
         >
           Guardar
@@ -149,6 +150,7 @@ const isEmptySignature = ref(true);
 const wasValidated = ref(false);
 const signatureKey = ref(0);
 const bindedMask = reactive({});
+const isSubmissionLocked = ref(false);
 
 const schema = Yup.object({
   name: Yup.string().min(3, 'Mínimo tres caracteres.').required('El nombre es requerido.'),
@@ -179,6 +181,8 @@ const validateSignature = () => {
 };
 
 const onSubmit = async ({ validate, resetForm, values }) => {
+  if (isSubmissionLocked.value) return;
+  
   const { valid } = await validate();
   wasValidated.value = true;
   isEmptySignature.value = signatureRef.value.isEmpty();
@@ -198,10 +202,11 @@ const onSubmit = async ({ validate, resetForm, values }) => {
   data.append('reservationNumber', Number(values.reservationNumber));
   data.append('signature', signatureRef.value.save());
   data.append('amount', Number(values.amount));
-  data.append('securityCode', Number(values.securityCode));
+  data.append('securityCode', values.securityCode);
   data.append('zipCode', values.zipArea);
 
   try {
+    isSubmissionLocked.value = true;
     const { data: isSaved } = await _saveSignatureData(data);
 
     // ++signatureKey.value;
@@ -219,6 +224,8 @@ const onSubmit = async ({ validate, resetForm, values }) => {
     });
   } catch (e) {
     console.error(e);
+  } finally {
+    isSubmissionLocked.value = false;
   }
 };
 
