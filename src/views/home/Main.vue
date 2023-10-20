@@ -69,7 +69,7 @@
       </div>
       <div class="security-code-input mb-2 col-12 col-md-6">
         <label for="securityCode" class="form-label">Código de Seguridad:</label>
-        <Field type="number" class="form-control" id="securityCode" v-model="securityCode" name="securityCode" />
+        <Field type="text" class="form-control" id="securityCode" v-model="securityCode" name="securityCode" />
         <ErrorMessage v-slot="{ message }" class="invalid-message text-danger" name="securityCode">
           <div class="invalid-message text-danger"><i class="fa fa-info-circle text-danger me-1"></i>{{ message }}</div>
         </ErrorMessage>
@@ -160,10 +160,12 @@ const schema = Yup.object({
   address: Yup.string().min(3, 'Mínimo tres caracteres.').required('La dirección es requerida.'),
   creditCard: Yup.string().required('La tarjeta de crédito es requerida.'),
   reservationNumber: Yup.number().required('El número de reservación es requerido.'),
-  zipArea: Yup.string().required('El número de de área es requerido.')
-    .test("is-area-code", "El número de de área solo contiene números.", 
+  zipArea: Yup.string().required('El número de área es requerido.')
+    .test("is-area-code", "El número de área solo contiene números.", 
       value => value && !isNaN(value)),
-  securityCode: Yup.number().required('El código de seguridad es requerido.'),
+  securityCode: Yup.string().required('El código de seguridad es requerido.')
+    .test("is-security-code", "El código de seguridad solo contiene números.", 
+      value => value && !isNaN(value)),
   expirationDate: Yup.string().required('La fecha de expiración es requerida.'),
   amount: Yup.number().required('El monto es requerido.'),
   identificationPhoto: Yup.mixed().required('La foto de identificación es requerida.')
